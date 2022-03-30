@@ -2,12 +2,13 @@ package tools
 
 import (
 	"fmt"
-	"github.com/RandolphCYG/wework/wework/api"
 	"io/ioutil"
 	"os"
 	"regexp"
 	"strings"
 	"time"
+
+	"github.com/RandolphCYG/wework/api"
 )
 
 func GenerateCorpAPIMethods() time.Time {

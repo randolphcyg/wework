@@ -3,10 +3,10 @@ package api
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/RandolphCYG/wework/wework/config"
-	"github.com/RandolphCYG/wework/wework/utils"
 	"strings"
 
+	"github.com/RandolphCYG/wework/config"
+	"github.com/RandolphCYG/wework/utils"
 	"github.com/pkg/errors"
 )
 

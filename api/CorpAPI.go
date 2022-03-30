@@ -2,8 +2,9 @@ package api
 
 import (
 	"fmt"
-	"github.com/RandolphCYG/wework/wework/config"
 	"sync"
+
+	"github.com/RandolphCYG/wework/config"
 )
 
 var CORP_API_TYPE = map[string][]string{

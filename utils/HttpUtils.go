@@ -2,7 +2,7 @@ package utils
 
 import (
 	"fmt"
-	"github.com/RandolphCYG/wework/wework/config"
+	"github.com/RandolphCYG/wework/config"
 	"io"
 	"io/ioutil"
 	"net/http"
