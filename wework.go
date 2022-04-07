@@ -248,7 +248,7 @@ func AESDecryptData(cipherText []byte, aesKey []byte, iv []byte) (rawData []byte
 
 }
 
-// ParseRecMsg 解析原生消息
+// ParseRecMsg parse raw messages
 func ParseRecMsg(reqData []byte) (res RecMsg, err error) {
 	if err := xml.Unmarshal(reqData, &res); nil != err {
 		return res, err
@@ -256,7 +256,7 @@ func ParseRecMsg(reqData []byte) (res RecMsg, err error) {
 	return res, nil
 }
 
-// ParseMsgContent 解析消息内容
+// ParseMsgContent parse the message content
 func ParseMsgContent(reqData []byte) (res MsgContent, err error) {
 	if err := xml.Unmarshal(reqData, &res); nil != err {
 		return res, err
@@ -264,7 +264,7 @@ func ParseMsgContent(reqData []byte) (res MsgContent, err error) {
 	return res, nil
 }
 
-// ValidSignature 验证签名
+// ValidSignature verify signature
 func ValidSignature(reqTimestamp, reqNonce, reqMsgSign, token, encrypt string) (err error) {
 	strs := []string{
 		reqTimestamp,
@@ -284,27 +284,51 @@ func ValidSignature(reqTimestamp, reqNonce, reqMsgSign, token, encrypt string) (
 	return
 }
 
-// DecryptMsg 解密消息 负责验证签名 解密消息
+// DecryptMsg decrypt message
 func DecryptMsg(reqTimestamp, reqNonce, reqMsgSign, token, aesKey string, reqData []byte) (res MsgContent, err error) {
-	// 解析内容
+	// parse the original content
 	recMsg, err := ParseRecMsg(reqData)
 	if err != nil {
 		return
 	}
-	// 验证签名
+	// verify signature
 	if err := ValidSignature(reqTimestamp, reqNonce, reqMsgSign, token, recMsg.Encrypt); err != nil {
 		return res, err
 	}
-	// 解密消息
+	// decrypt message
 	_, xmlMsg, _, err := AESDecryptMsg(recMsg.Encrypt, aesKey)
 	if err != nil {
 		return
 	}
-	// 解析内容
+	// Parse the content
 	res, err = ParseMsgContent(xmlMsg)
 	if err != nil {
 		return
 	}
 
+	return
+}
+
+// TruncateRobotMsg Truncate enterprise WeChat robot messages. Divide long messages by line judgment and return message slices.
+func TruncateRobotMsg(originalMsg, sep string) (resMsgSegments []string) {
+	if len([]byte(originalMsg)) < 4096 {
+		resMsgSegments = append(resMsgSegments, originalMsg)
+	} else {
+		// cut by row
+		msgSegments := strings.Split(originalMsg, sep)
+
+		var segment string
+		for _, s := range msgSegments {
+			countLen := len([]byte(segment + s))
+			if countLen > 4096 {
+				resMsgSegments = append(resMsgSegments, segment)
+				segment = s + sep
+			} else {
+				segment += s
+				segment += sep
+			}
+		}
+		resMsgSegments = append(resMsgSegments, segment) // add the last message
+	}
 	return
 }
